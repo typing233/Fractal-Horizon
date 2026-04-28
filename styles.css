@@ -1,0 +1,294 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#fractal-canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+}
+
+.panel {
+    position: absolute;
+    background-color: rgba(20, 20, 40, 0.9);
+    color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+
+#info-panel {
+    top: 20px;
+    left: 20px;
+    min-width: 280px;
+}
+
+#control-panel {
+    top: 20px;
+    right: 20px;
+    min-width: 280px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#control-panel.hidden {
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+}
+
+.panel h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #64d8ff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.info-item .label {
+    color: #aaa;
+}
+
+.info-item .value {
+    color: #fff;
+    font-family: 'Courier New', monospace;
+}
+
+.control-group {
+    margin-bottom: 16px;
+}
+
+.control-group:last-child {
+    margin-bottom: 0;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.control-group select,
+.control-group input[type="number"],
+.control-group input[type="range"] {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: rgba(60, 60, 80, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.control-group select:focus,
+.control-group input[type="number"]:focus,
+.control-group input[type="range"]:focus {
+    border-color: #64d8ff;
+    background-color: rgba(60, 60, 80, 1);
+}
+
+.control-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.control-group input[type="range"] {
+    padding: 0;
+    height: 6px;
+    -webkit-appearance: none;
+    background: transparent;
+}
+
+.control-group input[type="range"]::-webkit-slider-track {
+    height: 6px;
+    background: rgba(60, 60, 80, 0.8);
+    border-radius: 3px;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #64d8ff;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -6px;
+    box-shadow: 0 2px 6px rgba(100, 216, 255, 0.4);
+}
+
+.control-group input[type="range"]::-moz-range-track {
+    height: 6px;
+    background: rgba(60, 60, 80, 0.8);
+    border-radius: 3px;
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #64d8ff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(100, 216, 255, 0.4);
+}
+
+.param-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.param-inputs > div {
+    flex: 1;
+}
+
+.param-inputs label {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+#reset-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #64d8ff 0%, #4a9eff 100%);
+    border: none;
+    border-radius: 4px;
+    color: #1a1a2e;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#reset-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(100, 216, 255, 0.4);
+}
+
+#reset-btn:active {
+    transform: translateY(0);
+}
+
+.toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background-color: rgba(20, 20, 40, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 15;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: background-color 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background-color: rgba(40, 40, 60, 0.9);
+}
+
+@media (max-width: 768px) {
+    #info-panel,
+    #control-panel {
+        top: auto;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    #control-panel {
+        bottom: 200px;
+        transform: translateY(calc(100% + 20px));
+    }
+    
+    #control-panel.hidden {
+        transform: translateY(calc(100% + 20px));
+    }
+    
+    #control-panel.visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .toggle-btn {
+        display: flex;
+        top: 20px;
+        right: 20px;
+    }
+    
+    .param-inputs {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel {
+        padding: 12px;
+        border-radius: 6px;
+    }
+    
+    .panel h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .info-item,
+    .control-group label,
+    .control-group select,
+    .control-group input[type="number"],
+    #reset-btn {
+        font-size: 12px;
+    }
+    
+    .info-item .value {
+        font-size: 11px;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel {
+    animation: fadeIn 0.3s ease;
+}
