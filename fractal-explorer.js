@@ -227,8 +227,8 @@ class FractalExplorer {
     }
     
     initBuffers() {
-        const positionBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+        this.positionBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
         
         const positions = new Float32Array([
             -1.0, -1.0,
@@ -239,8 +239,8 @@ class FractalExplorer {
         
         this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.STATIC_DRAW);
         
-        const texCoordBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
+        this.texCoordBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
         
         const texCoords = new Float32Array([
             0.0, 0.0,
@@ -308,8 +308,13 @@ class FractalExplorer {
         const controlPanel = document.getElementById('control-panel');
         
         toggleControls.addEventListener('click', () => {
-            controlPanel.classList.toggle('visible');
-            controlPanel.classList.toggle('hidden');
+            if (controlPanel.classList.contains('visible')) {
+                controlPanel.classList.remove('visible');
+                controlPanel.classList.add('hidden');
+            } else {
+                controlPanel.classList.remove('hidden');
+                controlPanel.classList.add('visible');
+            }
         });
     }
     
@@ -455,6 +460,7 @@ class FractalExplorer {
             this.updateInfoPanel();
         } else if (e.touches.length === 2) {
             const currentDistance = this.getTouchDistance(e.touches);
+            if (this.touchStartDistance === 0) return;
             const scaleFactor = currentDistance / this.touchStartDistance;
             const newZoom = this.touchStartZoom * scaleFactor;
             
@@ -524,40 +530,18 @@ class FractalExplorer {
             this.gl.clearColor(0, 0, 0, 1);
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
             
-            const positionBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
-            
-            const positions = new Float32Array([
-                -1.0, -1.0,
-                1.0, -1.0,
-                -1.0, 1.0,
-                1.0, 1.0
-            ]);
-            
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.STATIC_DRAW);
-            
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
             this.gl.enableVertexAttribArray(this.aPosition);
             this.gl.vertexAttribPointer(this.aPosition, 2, this.gl.FLOAT, false, 0, 0);
             
-            const texCoordBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
-            
-            const texCoords = new Float32Array([
-                0.0, 0.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 1.0
-            ]);
-            
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.STATIC_DRAW);
-            
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
             this.gl.enableVertexAttribArray(this.aTexCoord);
             this.gl.vertexAttribPointer(this.aTexCoord, 2, this.gl.FLOAT, false, 0, 0);
             
             this.gl.uniform1f(this.uZoom, this.zoom);
             this.gl.uniform2f(this.uCenter, this.centerX, this.centerY);
             this.gl.uniform1i(this.uMaxIterations, this.maxIterations);
-            this.gl.uniform1i(this.uIsMandelbrot, this.isMandelbrot);
+            this.gl.uniform1i(this.uIsMandelbrot, this.isMandelbrot ? 1 : 0);
             this.gl.uniform2f(this.uJuliaParam, this.juliaParamX, this.juliaParamY);
             this.gl.uniform1i(this.uPaletteIndex, this.getPaletteIndex());
             this.gl.uniform2f(this.uCanvasSize, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
